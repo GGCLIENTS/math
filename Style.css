@@ -21,3 +21,6 @@ button:hover{
     width: 220px;
     height: 320px;
 }
+.content h1{
+    color: white;
+}

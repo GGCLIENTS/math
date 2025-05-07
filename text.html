@@ -1,119 +1,235 @@
 <!DOCTYPE html>
-<html lang="mn">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Өгөгдлийн Шинжилгээ - Тест</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f4f4f9;
-      padding: 40px;
-      color: #222;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Статистик Quiz</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f2f5;
+        }
 
-    h1, h2 {
-      text-align: center;
-      color: #114b8a;
-    }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
 
-    .section {
-      margin-bottom: 50px;
-    }
+        .question-box {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
 
-    .question-block {
-      background: #fff;
-      padding: 20px;
-      margin-bottom: 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
+        .question-text {
+            font-weight: bold;
+            color: #1a73e8;
+            margin-bottom: 15px;
+        }
 
-    .question-title {
-      font-weight: bold;
-      font-size: 1rem;
-      margin-bottom: 10px;
-    }
+        .options {
+            display: grid;
+            gap: 10px;
+        }
 
-    .data-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
-      margin-bottom: 10px;
-    }
+        .option {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
 
-    .data-table th, .data-table td {
-      border: 1px solid #ccc;
-      padding: 8px;
-      text-align: center;
-    }
+        .option:hover {
+            background-color: #f8f9fa;
+            transform: translateY(-2px);
+        }
 
-    .answer-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
-    }
+        table {
+            border-collapse: collapse;
+            margin: 10px 0;
+            width: 100%;
+        }
 
-    .answer-table th, .answer-table td {
-      border: 1px solid #ccc;
-      padding: 8px;
-      text-align: left;
-    }
+        td, th {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
 
-    .question-number {
-      color: #666;
-      font-size: 0.9rem;
-      margin-top: -8px;
-      margin-bottom: 8px;
-    }
-  </style>
+        .score-board {
+            text-align: center;
+            padding: 20px;
+            font-size: 1.2em;
+        }
+
+        button {
+            background-color: #1a73e8;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #1557b0;
+        }
+    </style>
 </head>
 <body>
+    <div class="container">
+        <div id="quiz-container"></div>
+        <div class="score-board">
+            <button onclick="calculateScore()">Дуусгах</button>
+            <p id="result"></p>
+        </div>
+    </div>
 
-<h1>Өгөгдлийн Шинжилгээ</h1>
-<h2>Асуултууд</h2>
+    <script>
+        const questions = [
+            {
+                question: "1. Дараах өгөгдлийн моодыг ол. 12, 15, 24, 15, 16, 17, 15, 18, 12, 11",
+                options: ["A. 15", "B. 12", "C. 11", "D. 13"],
+                correct: 0
+            },
+            {
+                question: "2. Дараах өгөгдлийн медианыг ол 20, 21, 15, 16, 17, 18, 20, 12",
+                options: ["A. 17.5", "B. 16.5", "C. 175", "D. 20"],
+                correct: 0
+            },
+            {
+                question: `3. 5-р сарын 1-10-ны өдрийн температур:<br>
+                    <table>
+                        <tr><th>Өдөр</th><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td></tr>
+                        <tr><th>t°C</th><td>9°</td><td>12°</td><td>15°</td><td>14°</td><td>9°</td><td>16°</td><td>12°</td><td>13°</td><td>9°</td><td>16°</td></tr>
+                    </table>`,
+                options: ["A. M₀=16; M=12.5", "B. M₀=16; M=12", "C. M₀=9; M=12.5"],
+                correct: 2
+            },
+            {
+                question: "4. Дараах өгөгдлийн далайцыг ол. 20.5, 21.6, 15.7, 1.6, 17.8, 1.8, 15.7",
+                options: ["A. 20", "B. 15.7", "C. 1.6", "D. 13"],
+                correct: 0
+            },
+            {
+                question: "5. Дараах өгөгдлийн арифметик дунджийг ол. 14, 11, 12, 16, 9, 7, 9, 8, 15, 13",
+                options: ["A. 11.4", "B. 1.14", "C. 114", "D. 12"],
+                correct: 3
+            },
+            {
+                question: `6. Тоонь арифметик дунджийг ол:<br>
+                    <table>
+                        <tr><th>Номын тоо</th><td>3</td><td>4</td><td>6</td><td>8</td></tr>
+                        <tr><th>Давтамж</th><td>2</td><td>3</td><td>4</td><td>1</td></tr>
+                    </table>`,
+                options: ["A. 50", "B. 2", "C. 5"],
+                correct: 2
+            },
+            {
+                question: `7. Дараах бүлэглэсэн өгөгдлийн моод бүлгийг ол:<br>
+                    <table>
+                        <tr><th>Завсар</th><td>[1;3]</td><td>[3;5]</td><td>[5;7]</td><td>[7;9]</td><td>[9;11]</td></tr>
+                        <tr><th>Давтамж</th><td>5</td><td>14</td><td>36</td><td>30</td><td>10</td></tr>
+                    </table>`,
+                options: ["A. [1;3]", "B. [3;5]", "C. [5;7]", "D. [7;9]"],
+                correct: 2
+            },
+            {
+                question: "8. Автобусанд 20-ноос 45 насны нийт 20 зорчигч яваа бол давтамжийн нягтыг ол.",
+                options: ["A. 4/9", "B. 0.8", "C. 1.25", "D. 2.25"],
+                correct: 2
+            },
+            {
+                question: "9. Бага сургуулийн сурагчийн насны мэдээллийн дараах хувиарлалаар харуулав. Гол далайцыг ол.",
+                options: ["A. 1", "B. 4", "C. 8", "D. 10"],
+                correct: 1
+            },
+            {
+                question: "10. (1, 2, 2, 3, 4, 4, y) өгөгдлийн дундаж 3 бол y-ийг ол.",
+                options: ["A. -13", "B. 2.26", "C. 2", "D. 5"],
+                correct: 3
+            },
+            {
+                question: `11. Дараах бүлэглэсэн өгөгдлийн дунджийг ол:<br>
+                    <table>
+                        <tr><th>Завсар</th><td>[1;3]</td><td>[2;4]</td><td>[5;7]</td><td>[7;9]</td><td>[9;11]</td></tr>
+                        <tr><th>Давтамж</th><td>3</td><td>4</td><td>5</td><td>6</td><td>2</td></tr>
+                    </table>`,
+                options: ["A. 6", "B. 5.8", "C. 2.2", "D. 8"],
+                correct: 1
+            },
+            {
+                question: `12. Дараах бүлэглэсэн өгөгдлийн дунджийг ол:<br>
+                    <table>
+                        <tr><th>Завсар</th><td>[0;2]</td><td>[2;4]</td><td>[4;6]</td><td>[6;8]</td><td>[8;10]</td></tr>
+                        <tr><th>Давтамж</th><td>3</td><td>4</td><td>5</td><td>6</td><td>2</td></tr>
+                    </table>`,
+                options: ["A. 2.2", "B. 4", "C. 5", "D. 20"],
+                correct: 2
+            },
+            {
+                question: `13. Иш-навчийн диаграм:<br>4155799<br>52445689<br>613336889<br>Түлхүүр: 4|5 = 45`,
+                options: ["A. 57", "B. 56", "C. 24", "D. 63"],
+                correct: 0
+            },
+            {
+                question: "14. 2,4,6,7,9,10,12,12,13 өгөгдлийн квартил хоорондын далайцыг ол.",
+                options: ["A. Q₃-Q₁=7", "B. Q₃-Q₁=9", "C. Q₃-Q₁=12", "D. Q₃-Q₁=11"],
+                correct: 0
+            },
+            {
+                question: "15. 8,9,6,5,10,7,6,7,8,4 өгөгдлийн арифметик дунджийг ол.",
+                options: ["A. 2", "B. 7", "C. 6", "D. 8"],
+                correct: 1
+            },
 
-<div class="section" id="questions">
-  <div class="question-block">
-    <div class="question-title">1. Дараах өгөгдлийн модулийг ол: 12, 15, 24, 15, 16, 17, 15, 18, 12, 11</div>
-  </div>
+        ];
 
-  <div class="question-block">
-    <div class="question-title">2. Дараах өгөгдлийн медианыг ол: 20, 21, 15, 16, 17, 18, 20</div>
-  </div>
+        let userAnswers = new Array(questions.length);
 
-  <div class="question-block">
-    <div class="question-title">3. Цаг уурын станцын 5 сарын 1–10-ны өдрийн температур:</div>
-    <table class="data-table">
-      <tr><th>Өдөр</th><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td></tr>
-      <tr><th>Темп</th><td>9</td><td>12</td><td>14</td><td>15</td><td>14</td><td>9</td><td>16</td><td>13</td><td>9</td><td>16</td></tr>
-    </table>
-    <p>Модулийг (M₀) ба медиан (M)-г ол.</p>
-  </div>
+        function renderQuiz() {
+            const container = document.getElementById('quiz-container');
+            container.innerHTML = questions.map((q, index) => `
+                <div class="question-box">
+                    <div class="question-text">${q.question}</div>
+                    <div class="options">
+                        ${q.options.map((opt, i) => `
+                            <div class="option" onclick="selectAnswer(${index}, ${i})">
+                                ${userAnswers[index] === i ? '✓ ' : ''}${opt}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
 
-  <div class="question-block">
-    <div class="question-title">4. Дараах өгөгдлийн дэлгэрийг ол: 20.5, 21.6, 15.7, 17.6, 18.8, 15.7</div>
-  </div>
+        function selectAnswer(questionIndex, optionIndex) {
+            userAnswers[questionIndex] = optionIndex;
+            renderQuiz();
+        }
 
-  <div class="question-block">
-    <div class="question-title">5. Арифметик дундаж ол: 14, 11, 12, 16, 9, 7, 9, 8, 15, 13</div>
-  </div>
+        function calculateScore() {
+            const score = questions.reduce((acc, q, i) => 
+                acc + (userAnswers[i] === q.correct ? 1 : 0), 0);
+            
+            document.getElementById('result').innerHTML = `
+                Таны оноо: ${score}/${questions.length}<br>
+                Дэлгэрэнгүй үр дүн:<br>
+                ${questions.map((q, i) => 
+                    `${i+1}. ${userAnswers[i] === q.correct ? '✓' : '✗'} (Зөв хариулт: ${q.options[q.correct]})`
+                ).join('<br>')}
+            `;
+        }
 
-  <div class="question-block">
-    <div class="question-title">6. Нэг сурагчдын авчирсан номын тоо:</div>
-    <table class="data-table">
-      <tr><th>Номын тоо</th><td>3</td><td>4</td><td>6</td><td>8</td></tr>
-      <tr><th>Давтамж</th><td>2</td><td>3</td><td>4</td><td>1</td></tr>
-    </table>
-  </div>
-
-  <div class="question-block">
-    <div class="question-title">7. Бүлэглэсэн өгөгдлийн мод бүлгийг ол:</div>
-    <table class="data-table">
-      <tr><th>Завсар</th><td>[1;3]</td><td>[3;5]</td><td>[5;7]</td><td>[7;9]</td><td>[9;11]</td></tr>
-      <tr><th>Давтамж</th><td>5</td><td>14</td><td>36</td><td>30</td><td>10</td></tr>
-    </table>
-  </div>
-</div>
-
+        // Initial render
+        renderQuiz();
+    </script>
 </body>
 </html>

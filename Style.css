@@ -1,0 +1,23 @@
+body{
+    background-color: rgb(31, 31, 31);
+}
+.content{
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+
+}
+
+.content button{
+    background-color: green;
+    color: black;
+    width: 200px;
+    height: 300px;
+    margin: 50px;
+    transition: 0.1s;
+}
+button:hover{
+    box-shadow: rgba(0, 195, 55, 0.756) 0px 0px 4px 4px;
+    width: 220px;
+    height: 320px;
+}
